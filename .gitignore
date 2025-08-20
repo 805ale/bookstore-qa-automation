@@ -1,0 +1,14 @@
+﻿node_modules/
+*.log
+dist/
+.DS_Store
+.env
+server/.env
+client/.env
+frontend/test-results/
+playwright-report/
+.vs/
+.vscode/
+*.user
+*.suo
+Thumbs.db
