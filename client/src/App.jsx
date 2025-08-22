@@ -3,39 +3,68 @@ import { listBooks, createBook, updateBook, deleteBook } from './api';
 import BookForm from './components/BookForm.jsx';
 import BookList from './components/BookList.jsx';
 
-
 export default function App() {
     const [books, setBooks] = useState([]);
     const [editing, setEditing] = useState(null);
+    const [error, setError] = useState(null);
+    const [loadingList, setLoadingList] = useState(true);
 
     async function refresh() {
-        const data = await listBooks();
-        setBooks(data);
+        setError(null);
+        setLoadingList(true);
+        try {
+            const data = await listBooks();
+            setBooks(Array.isArray(data) ? data : (data.items || [])); // supports future pagination
+        } catch (e) {
+            setError(e.message);
+        } finally {
+            setLoadingList(false);
+        }
     }
 
-    useEffect(() => {
-        refresh();
-    }, []);
+    useEffect(() => { refresh(); }, []);
 
     async function handleSubmit(data) {
-        if (editing) {
-            await updateBook(editing._id, data);
-            setEditing(null);
-        } else {
-            await createBook(data);
+        setError(null);
+        try {
+            if (editing) {
+                await updateBook(editing._id, data);
+                setEditing(null);
+            } else {
+                await createBook(data);
+            }
+            await refresh();
+        } catch (e) {
+            setError(e.message);
         }
-        await refresh();
     }
 
     async function handleDelete(id) {
-        await deleteBook(id);
-        await refresh();
+        setError(null);
+        try {
+            await deleteBook(id);
+            await refresh();
+        } catch (e) {
+            setError(e.message);
+        }
     }
 
     return (
-        <div style={{ padding: "1rem", fontFamily: "sans-serif" }}>
+        <div style={{ padding: 16, fontFamily: 'ui-sans-serif, system-ui' }}>
             <h1>📚 Bookstore</h1>
-            <BookForm onSubmit={handleSubmit} editing={editing} />
+
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+                <button onClick={refresh}>Refresh</button>
+                {loadingList && <span>Loading…</span>}
+            </div>
+
+            {error && (
+                <div style={{ background: '#ffe6e6', color: '#900', padding: 8, marginBottom: 12, border: '1px solid #f99' }}>
+                    {error}
+                </div>
+            )}
+
+            <BookForm onSubmit={handleSubmit} editing={editing} onCancel={() => setEditing(null)} />
             <BookList books={books} onEdit={setEditing} onDelete={handleDelete} />
         </div>
     );

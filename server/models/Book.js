@@ -3,16 +3,22 @@
 import mongoose from "mongoose";
 
 // Schema = structure of the "books" collection
-const BookSchema = new mongoose.Schema(
-    {
-        title: { type: String, required: true },   // book title
-        author: { type: String, required: true },  // author name
-        price: { type: Number, required: true, min: 0 }, // must be ≥ 0
-        isbn: { type: String, unique: true, required: true }, // unique book identifier
-        stock: { type: Number, default: 0, min: 0 } // how many copies available
+const bookSchema = new mongoose.Schema({
+    title: { type: String, required: true, trim: true },
+    author: { type: String, required: true, trim: true },
+    price: { type: Number, required: true, min: 0 },
+    isbn: { type: String, required: true, unique: true, trim: true },
+    stock: { type: Number, required: true, min: 0 },
+
+    // 🔽 New fields (must come after a comma!)
+    category: {
+        type: String,
+        enum: ["Fantasy", "Sci-Fi", "Romance", "Non-Fiction", "Other"],
+        default: "Other"
     },
-    { timestamps: true } // adds createdAt & updatedAt automatically
-);
+    publishedYear: { type: Number, min: 0 }
+}, { timestamps: true });
+
 
 // Export the model → creates "books" collection in MongoDB
-export default mongoose.model("Book", BookSchema);
+export default mongoose.model("Book", bookSchema);

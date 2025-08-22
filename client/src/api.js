@@ -1,34 +1,38 @@
-// API wrapper for backend calls
-export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:2000';
+﻿export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:2000';
 
-// GET all books
-export async function listBooks() {
-    const res = await fetch(`${API_BASE}/api/books`);
-    return res.json();
+async function handle(res) {
+    // Normalize responses: throw on non-2xx with parsed error
+    if (!res.ok) {
+        let err = {};
+        try { err = await res.json(); } catch { }
+        const message = err.error || `HTTP ${res.status}`;
+        throw new Error(message);
+    }
+    // DELETE returns { ok: true }; others return JSON document(s)
+    return res.status === 204 ? null : res.json();
 }
 
-// POST create book
-export async function createBook(data) {
-    const res = await fetch(`${API_BASE}/api/books`, {
+export function listBooks() {
+    return fetch(`${API_BASE}/api/books`).then(handle);
+}
+
+export function createBook(data) {
+    return fetch(`${API_BASE}/api/books`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    });
-    return res.json();
+        body: JSON.stringify(data)
+    }).then(handle);
 }
 
-// PUT update book
-export async function updateBook(id, data) {
-    const res = await fetch(`${API_BASE}/api/books/${id}`, {
+export function updateBook(id, data) {
+    return fetch(`${API_BASE}/api/books/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    });
-    return res.json();
+        body: JSON.stringify(data)
+    }).then(handle);
 }
 
-// DELETE book
-export async function deleteBook(id) {
-    const res = await fetch(`${API_BASE}/api/books/${id}`, { method: 'DELETE' });
-    return res.json();
+export function deleteBook(id) {
+    return fetch(`${API_BASE}/api/books/${id}`, { method: 'DELETE' }).then(handle);
 }
+

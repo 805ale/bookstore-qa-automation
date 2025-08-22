@@ -1,30 +1,46 @@
-import React from 'react';
+﻿import React from 'react';
 
 export default function BookList({ books, onEdit, onDelete }) {
-    if (!books.length) return <p>No books yet</p>;
+    if (!books?.length) return <p>No books yet</p>;
 
     return (
-        <table border="1" cellPadding="6">
+        <table aria-label="book-table" style={{ borderCollapse: 'collapse', width: '100%', maxWidth: 1000 }}>
             <thead>
                 <tr>
-                    <th>Title</th><th>Author</th><th>Price</th><th>ISBN</th><th>Stock</th><th>Actions</th>
+                    <Th>Title</Th>
+                    <Th>Author</Th>
+                    <Th>Price</Th>
+                    <Th>ISBN</Th>
+                    <Th>Stock</Th>
+                    <Th>Category</Th>
+                    <Th>Year</Th>
+                    <Th>Actions</Th>
                 </tr>
             </thead>
             <tbody>
                 {books.map(b => (
                     <tr key={b._id}>
-                        <td>{b.title}</td>
-                        <td>{b.author}</td>
-                        <td>{b.price}</td>
-                        <td>{b.isbn}</td>
-                        <td>{b.stock}</td>
-                        <td>
-                            <button onClick={() => onEdit(b)}>Edit</button>
+                        <Td>{b.title}</Td>
+                        <Td>{b.author}</Td>
+                        <Td>{Number(b.price).toFixed(2)}</Td>
+                        <Td>{b.isbn}</Td>
+                        <Td>{b.stock}</Td>
+                        <Td>{b.category ?? 'Other'}</Td>
+                        <Td>{b.publishedYear ?? ''}</Td>
+                        <Td>
+                            <button onClick={() => onEdit(b)} style={{ marginRight: 6 }}>Edit</button>
                             <button onClick={() => onDelete(b._id)}>Delete</button>
-                        </td>
+                        </Td>
                     </tr>
                 ))}
             </tbody>
         </table>
     );
+}
+
+function Th({ children }) {
+    return <th style={{ textAlign: 'left', borderBottom: '1px solid #ddd', padding: '6px 8px' }}>{children}</th>;
+}
+function Td({ children }) {
+    return <td style={{ borderBottom: '1px solid #eee', padding: '6px 8px' }}>{children}</td>;
 }
