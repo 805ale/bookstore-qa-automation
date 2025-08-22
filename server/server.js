@@ -5,6 +5,7 @@ import mongoose from "mongoose"; // MongoDB ODM (Object Data Mapper)
 import cors from "cors";         // Middleware to allow cross-origin requests
 import dotenv from "dotenv";     // Loads environment variables from .env
 import booksRouter from "./routes/books.js"; // Routes for CRUD on books
+import fs from 'fs';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -39,3 +40,10 @@ mongoose
         console.error("Mongo connection error:", err);
         process.exit(1); // Exit process if DB connection fails
     });
+
+
+if (process.env.NODE_ENV === 'test' && fs.existsSync('.env.test')) {
+    dotenv.config({ path: '.env.test' });
+} else {
+    dotenv.config();
+}

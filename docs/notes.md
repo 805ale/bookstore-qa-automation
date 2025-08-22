@@ -178,6 +178,52 @@ postman/ → Postman collections
 - Empty List before Create → run List *after* Create or seed in a pre-request.
 
 
+## Part 5 — Data Strategy & Testability
+
+### Goals
+- Make e2e tests **deterministic** and **fast** by resetting DB state before each test.
+- Allow **seeded fixtures** for predictable scenarios.
+- Keep selectors stable; add `role="alert"` / `data-testid` only where semantics aren’t enough.
+
+### What I implemented
+- **Test environment** for backend:
+  - `server/.env.test`  
+    ```
+    MONGO_URI=mongodb://127.0.0.1:27017/bookstore_qa_test
+    PORT=2002
+    NODE_ENV=test
+    ```
+- **Reset script** (guarded by `NODE_ENV=test`):
+  - `server/scripts/reset.js` — connects to the test DB and clears the `books` collection.
+  - `server/package.json` scripts:
+    ```json
+    {
+      "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js",
+        "start:test": "cross-env NODE_ENV=test node server.js",
+        "reset:test": "cross-env NODE_ENV=test node scripts/reset.js",
+        "seed:test": "cross-env NODE_ENV=test node scripts/seed.js"
+      }
+    }
+    ```
+- **Optional seed fixtures**:
+  - `server/scripts/seed.js` — inserts a couple of known books (e.g., Dune, Clean Code).
+
+- **Playwright alignment**:
+  - Tests can point to **UI** at `http://localhost:5173` and **API (test)** at `http://localhost:2002`.
+  - `frontend/tests/helpers.ts` uses `API_BASE_URL` env var (defaults to `http://localhost:2002` for tests).
+  - `test.beforeEach` resets DB (via API delete‑all helper or by calling the reset script).
+  - Added `role="alert"` (and optional `data-testid="error-banner"`) to error banner in `client/src/App.jsx` to make duplicate‑ISBN assertions unambiguous.
+
+### How I run tests with a clean DB
+1) **Start test API**:
+   ```bash
+   cd server
+   npm run start:test  # -> http://localhost:2002
+
+
+
 ## 🧪 QA Tips
 - Verify API directly:  
 [http://localhost:2000/api/books](http://localhost:2000/api/books)  
