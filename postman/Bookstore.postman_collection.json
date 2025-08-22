@@ -1,0 +1,55 @@
+﻿{
+  "info": {
+    "name": "Bookstore",
+    "_postman_id": "bookstore-collection",
+    "description": "API tests for Bookstore backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": [ "{{base_url}}" ],
+          "path": [ "" ]
+        }
+      }
+    },
+    {
+      "name": "List Books",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/books",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "books" ]
+        }
+      }
+    },
+    {
+      "name": "Create Book (positive)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Test Book\",\n  \"author\": \"QA Bot\",\n  \"price\": 12.99,\n  \"isbn\": \"test-12345\",\n  \"stock\": 3,\n  \"category\": \"Other\",\n  \"publishedYear\": 2024\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/books",
+          "host": [ "{{base_url}}" ],
+          "path": [ "api", "books" ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
