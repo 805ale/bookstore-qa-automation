@@ -59,7 +59,11 @@ export default function App() {
             </div>
 
             {error && (
-                <div style={{ background: '#ffe6e6', color: '#900', padding: 8, marginBottom: 12, border: '1px solid #f99' }}>
+                <div
+                    role="alert"
+                    data-testid="error-banner"
+                    style={{ background: '#ffe6e6', color: '#900', padding: 8, marginBottom: 12, border: '1px solid #f99' }}
+                >
                     {error}
                 </div>
             )}
