@@ -1,94 +1,69 @@
-﻿
-## What I built
-- A minimal full‑stack CRUD app for an online bookstore.
-- **Backend**: Node/Express + MongoDB with a `Book` model and REST endpoints.
-- **Frontend**: React + Vite (separate dev server).
-- **Testing tools** prepared: Playwright browsers installed; Postman app ready.
+﻿# 📖 Project Notes — Bookstore QA Automation
 
 ---
 
-## Project structure
-bookstore-qa-automation/
-server/ # Express API
-client/ # React (Vite)
-frontend/ # Playwright tests
-postman/ # Postman artifacts
-README.md
-docs/
+## Part 0 — Orientation & Prereqs
 
+- ✅ Installed **Node.js**, **MongoDB**, **Postman** and verified versions.
+- ✅ Created project scaffold:
+server/ → Express + MongoDB backend
+client/ → React (Vite) frontend
+frontend/ → Playwright tests
+postman/ → Postman collections
 
----
-
-## Environment & prerequisites (Part 0)
-- Installed Node.js 18+, MongoDB (local service or Atlas), Postman.
-- Created `.env` files:
-  - **server/.env**
-    ```
-    MONGO_URI=mongodb://127.0.0.1:27017/bookstore_qa
-    PORT=2000
-    ```
-  - **client/.env**
-    ```
-    VITE_API_BASE=http://localhost:2000
-    ```
-- **Important IDE note**: `.env` may be hidden; in Visual Studio use **Show All Files** in Solution Explorer; in VS Code tweak `files.exclude` or click the ⚙️ gear → Settings.
-- **Vite gotcha fixed**: `index.html` must live at `client/index.html` (project root), not inside `public/`.
+- ✅ Added `.env` files:
+- `server/.env` → `MONGO_URI`, `PORT`
+- `client/.env` → `VITE_API_BASE`
+- ✅ Verified connectivity:
+- Backend → [http://localhost:2000](http://localhost:2000) returned  
+  ```json
+  { "ok": true, "service": "bookstore-api" }
+  ```
+- Frontend → [http://localhost:5173](http://localhost:5173) rendered React UI
+- ✅ Initialized Git repo, added `.gitignore`, wrote initial `README.md`, pushed scaffold to GitHub.
 
 ---
 
-## Backend API (Part 1)
-### Key files
-- `server/server.js` – Express app, Mongo connect, routes mount.
-- `server/models/Book.js` – schema+model (`title`, `author`, `price≥0`, `isbn` **unique**, `stock≥0`).
-- `server/routes/books.js` – CRUD:
-  - `POST   /api/books` → create (201)
-  - `GET    /api/books` → list (newest first)
-  - `GET    /api/books/:id` → get by id (400 invalid id, 404 not found)
-  - `PUT    /api/books/:id` → update (validates, returns updated)
-  - `DELETE /api/books/:id` → delete ({ ok: true })
+## Part 1 — Backend API (Express + MongoDB)
 
-### Start & verify
-- Start MongoDB (Windows):
-  - If service exists: `Get-Service *mongo*` → `Start-Service "<ServiceName>"`
-  - Or manual: `mkdir C:\data\db` → run `mongod --dbpath C:\data\db` (keep it open)
-- Start server:
-  ```bash
-  cd server
-  npm install
-  npm run start
-  # ✅ Server running at http://localhost:2000
+- 🛠️ Implemented **Book model** (`models/Book.js`) with schema validation:
+- `title`, `author`, `price`, `isbn`, `stock`
+- 🛠️ Created CRUD routes (`routes/books.js`):
+- `POST /api/books` → Create  
+- `GET /api/books` → List  
+- `PUT /api/books/:id` → Update  
+- `DELETE /api/books/:id` → Delete
+- ✅ Verified API with PowerShell `Invoke-RestMethod`:
+- Create, List, Update, Delete worked as expected.
+- 🔒 Enforced **unique ISBN** → duplicate POST returns **400**.
+- ➕ Extended schema with:
+- `category` → enum: `Fantasy`, `Sci-Fi`, `Romance`, `Non-Fiction`, `Other`
+- `publishedYear` → number, optional
+- 🧪 Confirmed persistence and correct API responses.
 
-Health:
-Invoke-RestMethod -Uri http://localhost:2000/ -Method Get
-# { ok = True; service = bookstore-api }
+---
 
-API smoke (PowerShell‑friendly)
-# CREATE
-Invoke-RestMethod -Uri http://localhost:2000/api/books `
-  -Method Post -ContentType 'application/json' `
-  -Body '{"title":"Dune","author":"Frank Herbert","price":19.5,"isbn":"9780441172719","stock":2}'
+## Part 2 — Frontend (React + Vite)
 
-# LIST
-Invoke-RestMethod -Uri http://localhost:2000/api/books -Method Get
-
-# UPDATE (replace <id> with real _id)
-Invoke-RestMethod -Uri http://localhost:2000/api/books/<id> `
-  -Method Put -ContentType 'application/json' `
-  -Body '{"price":25,"stock":10}'
-
-# DELETE
-Invoke-RestMethod -Uri http://localhost:2000/api/books/<id> -Method Delete
-
-Frontend (connected to backend) – quick notes
-
-Start Vite in another terminal:
-
-cd client
-npm install
-npm run dev
-# → http://localhost:5173
+- 🖼️ Built **UI components**:
+- `BookForm.jsx` → form for add/edit
+- `BookList.jsx` → table with edit/delete buttons
+- 🔗 Connected frontend to backend via `src/api.js`.
+- ✅ Verified CRUD flow end-to-end in UI:
+- Add → Book appears in table
+- Edit → Stock/fields update in place
+- Delete → Book removed
+- Refresh → Data persists
+- ➕ Extended frontend to support new backend fields:
+- **Category** → dropdown with schema enums
+- **Published Year** → optional number field
+- 📊 Updated table to display category + year.
 
 
-The app fetches from VITE_API_BASE (so set client/.env and restart npm run dev).
 
-If you add books via Postman/PowerShell, refresh the page (or add a “Refresh” button) to refetch.
+## 🧪 QA Tips
+- Verify API directly:  
+[http://localhost:2000/api/books](http://localhost:2000/api/books)  
+- Cross-check UI at:  
+[http://localhost:5173](http://localhost:5173)  
+- Use Postman collection (`postman/`) for both positive + negative scenarios.
