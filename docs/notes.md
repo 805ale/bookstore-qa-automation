@@ -224,6 +224,18 @@ postman/ → Postman collections
 
 
 
+## Part 6 — CI (GitHub Actions)
+- Added `.github/workflows/ci.yml`:
+  - MongoDB service (Docker) for tests.
+  - Build client, serve with `vite preview` on port 3000.
+  - Start API in `NODE_ENV=test` on port 2002 (uses test DB).
+  - Wait for both with `wait-on`.
+  - Install Playwright browsers and run tests headless.
+  - Upload HTML report + artifacts.
+- Optional: run Postman collection with Newman.
+
+
+
 ## 🧪 QA Tips
 - Verify API directly:  
 [http://localhost:2000/api/books](http://localhost:2000/api/books)  
