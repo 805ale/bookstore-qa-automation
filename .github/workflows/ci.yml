@@ -49,6 +49,8 @@ jobs:
       # Build client and serve on port 3000
       - name: Build client
         working-directory: client
+        env:
+            VITE_API_BASE: http://localhost:2002   # 👈 tell React where the API is during build
         run: npm run build
 
       - name: Start client (vite preview on 3000)
